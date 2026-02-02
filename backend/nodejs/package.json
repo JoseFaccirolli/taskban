@@ -1,0 +1,16 @@
+{
+  "name": "apinodeuser",
+  "version": "1.0.0",
+  "description": "Api de gerenciamento de usuarios do taskban",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "JoseFaccirolli",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "express": "^5.2.1",
+    "mysql2": "^3.16.2"
+  }
+}
