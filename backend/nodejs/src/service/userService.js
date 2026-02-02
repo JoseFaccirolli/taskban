@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const connect = require("../database/connect");
-const SALT_ROUNDS = 10
+const crypto = require("crypto");
+const SALT_ROUNDS = 10; 
 module.exports = class UserController {
     static async createUser(name, email, password) {
         if(!email.includes("@") || !email.includes(".")) {
@@ -11,12 +12,12 @@ module.exports = class UserController {
         }
 
         const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-        const query = `INSERT INTO users (name, email, password) VALUES (?, ?, ?)`;
-        const values = [name, email, hashedPassword];
+        const userId = crypto.randomUUID();
+        const query = `INSERT INTO users (user_id, name, email, password) VALUES (?, ?, ?, ?)`;
+        const values = [userId, name, email, hashedPassword];
 
         try {
-            const [rows] = await connect.execute(query, values);
-            return rows;
+            await connect.execute(query, values);
         } catch (error) {
             if (error.code === "ER_DUP_ENTRY") {
                 throw {status: 409, message: "Email already registered."}

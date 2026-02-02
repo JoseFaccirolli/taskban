@@ -11,8 +11,7 @@ module.exports = class UserController {
         }
 
         try {
-            const rows = await UserService.createUser(name, email, password);
-            console.log(rows);
+            await UserService.createUser(name, email, password);
             return res.status(201).json({
                 error: false,
                 message: "User created sucessfully."
