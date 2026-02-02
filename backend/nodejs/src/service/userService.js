@@ -18,11 +18,19 @@ module.exports = class UserController {
             const [rows] = await connect.execute(query, values);
             return rows;
         } catch (error) {
-            console.log("service:", error); // ----------- TEMP -----------
-            if (error.status) throw error;
             if (error.code === "ER_DUP_ENTRY") {
                 throw {status: 409, message: "Email already registered."}
             }
+            throw {status: 500, message: "Internal server error."}
+        }
+    }
+
+    static async readAllUsers(){
+        const query = `SELECT user_id, name, email FROM users`;
+        try {
+            const [users] = await connect.execute(query);
+            return users;
+        } catch (error) {
             throw {status: 500, message: "Internal server error."}
         }
     }
