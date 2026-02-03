@@ -7,8 +7,8 @@ module.exports = class UserController {
         if(!email.includes("@") || !email.includes(".")) {
             throw {status: 400, message: "Invalid email format."}
         }
-        if(password.length < 8) {
-            throw {status: 400, message: "Invalid password: minimum length is 8 characters."}
+        if(password.length < 6) {
+            throw {status: 400, message: "Invalid password: minimum length is 6 characters."}
         }
 
         const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
@@ -33,6 +33,48 @@ module.exports = class UserController {
             return users;
         } catch (error) {
             throw {status: 500, message: "Internal server error."}
+        }
+    }
+
+    static async updateUser(userId, name, email, password) {
+        const updates = [];
+        const values = [];
+
+        if (name) {
+            updates.push("name = ?");
+            values.push(name);
+        }
+        if (email) {
+            if (!email.includes("@") || !email.includes(".")) {
+                throw { status: 400, message: "Invalid email format." }
+            }
+            updates.push("email = ?");
+            values.push(email);
+        }
+        if (password) {
+            if (password.length < 6) {
+                throw { status: 400, message: "Invalid password: minimum length is 6 characters." }
+            }
+            const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+            updates.push("password = ?");
+            values.push(hashedPassword);
+        }
+
+        values.push(userId);
+        const query = `UPDATE users SET ${updates.join(", ")} WHERE user_id = ?`;
+        
+        try {
+            const [result] = await connect.execute(query, values);
+            if (result.affectedRows === 0) {
+                throw { status: 404, message: "User not found." }
+            }
+            return result;
+        } catch (error) {
+            if (error.code === "ER_DUP_ENTRY") {
+                throw { status: 209, message: "Email already registered." }
+            }
+            if (error.status) throw error;
+            throw { status: 500, message: "Internal server error." }
         }
     }
 }

@@ -39,4 +39,29 @@ module.exports = class UserController {
             });
         }
     }
+
+    static async updateUser(req, res) {
+        const { userId } = req.params;
+        const { name, email, password } = req.body;
+
+        if (!name && !email && !password) {
+            return res.status(400).json({
+                error: true,
+                message: "No fields provided to update."
+            });
+        }
+        
+        try {
+            await UserService.updateUser(userId, name, email, password)
+            return res.status(200).json({
+                error: false,
+                message: "User updated successfully"
+            });
+        } catch (error) {
+            return res.status(error.status || 500).json({
+                error: true,
+                message: error.message || "Internal server error."
+            });
+        }
+    }
 }
