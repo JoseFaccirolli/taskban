@@ -77,4 +77,19 @@ module.exports = class UserController {
             throw { status: 500, message: "Internal server error." }
         }
     }
+
+    static async deleteUser(userId) {
+        const query = `DELETE FROM users WHERE user_id = ?`;
+
+        try {
+            const [result] = await connect.execute(query, [userId]);
+            if (result.affectedRows === 0) {
+                throw { status: 404, message: "User not found." }
+            }
+            return result;
+        } catch (error) {
+            if (error.status) throw error;
+            throw { status: 500, message: "Internal server error." }            
+        }
+    }
 }

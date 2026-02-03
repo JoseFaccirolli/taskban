@@ -55,7 +55,24 @@ module.exports = class UserController {
             await UserService.updateUser(userId, name, email, password)
             return res.status(200).json({
                 error: false,
-                message: "User updated successfully"
+                message: "User updated successfully."
+            });
+        } catch (error) {
+            return res.status(error.status || 500).json({
+                error: true,
+                message: error.message || "Internal server error."
+            });
+        }
+    }
+
+    static async deleteUser(req, res) {
+        const { userId } = req.params;
+
+        try {
+            await UserService.deleteUser(userId);
+            return res.status(200).json({
+                error: false,
+                message: "User deleted successfully."
             });
         } catch (error) {
             return res.status(error.status || 500).json({
