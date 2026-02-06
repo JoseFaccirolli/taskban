@@ -2,7 +2,6 @@ package com.taskban.taskban_api.controller;
 
 import com.taskban.taskban_api.business.BoardService;
 import com.taskban.taskban_api.controller.dto.CreateBoardRequest;
-import com.taskban.taskban_api.controller.dto.CreateBoardRequest;
 import com.taskban.taskban_api.controller.dto.UpdateBoardRequest;
 import com.taskban.taskban_api.infrastructure.entities.Board;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +28,7 @@ public class BoardController {
             @PathVariable Integer userId,
             @PathVariable Integer boardId
     ){
-        return boardService.searchBoardById(boardId);
+        return boardService.searchBoardById(userId, boardId);
     }
 
     @PostMapping
