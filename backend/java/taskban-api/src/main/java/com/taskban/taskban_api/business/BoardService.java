@@ -32,12 +32,21 @@ public class BoardService {
         return boardRepository.save(board);
     }
 
-    public Board searchBoardById(Integer boardId) {
-        return boardRepository.findByIdWithUser(boardId)
-                .orElseThrow(() ->
-                        new BoardNotFoundException("Board not found with id " + boardId)
-                );
+    public Board searchBoardById(Integer userId, Integer boardId) {
+
+        getUserOrThrow(userId);
+
+        Board board = getBoardOrThrow(boardId);
+
+        if (!board.getUser().getId().equals(userId)) {
+            throw new UnauthorizedAccessException(
+                    "You are not allowed to access this board"
+            );
+        }
+
+        return board;
     }
+
 
     public List<Board> searchBoardsByUser(Integer userId) {
         User user = getUserOrThrow(userId);
