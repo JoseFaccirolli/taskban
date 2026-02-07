@@ -81,4 +81,29 @@ module.exports = class UserController {
             });
         }
     }
+
+    static async loginUser(req, res) {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({
+                error: true,
+                message: "Missing required fields."
+            });
+        }
+
+        try {
+            const user = await UserService.loginUser(email, password);
+            return res.status(200).json({
+                error: false,
+                message: "User successfully logged in.",
+                data: user
+            });
+        } catch (error) {
+            return res.status(error.status || 500).json({
+                error: true,
+                message: error.message || "Internal server error."
+            });
+        }
+    }
 }

@@ -2,7 +2,8 @@ const bcrypt = require("bcrypt");
 const connect = require("../database/connect");
 const crypto = require("crypto");
 const SALT_ROUNDS = 10; 
-module.exports = class UserController {
+
+module.exports = class UserService {
     static async createUser(name, email, password) {
         if(!email.includes("@") || !email.includes(".")) {
             throw {status: 400, message: "Invalid email format."}
@@ -71,7 +72,7 @@ module.exports = class UserController {
             return result;
         } catch (error) {
             if (error.code === "ER_DUP_ENTRY") {
-                throw { status: 209, message: "Email already registered." }
+                throw { status: 409, message: "Email already registered." }
             }
             if (error.status) throw error;
             throw { status: 500, message: "Internal server error." }
@@ -90,6 +91,33 @@ module.exports = class UserController {
         } catch (error) {
             if (error.status) throw error;
             throw { status: 500, message: "Internal server error." }            
+        }
+    }
+
+    static async loginUser(email, password) {
+        const query = `SELECT user_id, name, email, password FROM users WHERE email = ?`;
+
+        try {
+            const [result] = await connect.execute(query, [email]);
+            if (result.length === 0) {
+                throw { status: 401, message: "Invalid email or password." }
+            }
+
+            const user = result[0];
+            const correctPassword = await bcrypt.compare(password, user.password);
+
+            if (!correctPassword) {
+                throw { status: 401, message: "Invalid email or password." }
+            }
+
+            return {
+                id: user.user_id,
+                email: user.email,
+                name: user.name
+            };
+        } catch (error) {
+            if (error.status) throw error;
+            throw { status: 500, message: "Internal Server Error" }
         }
     }
 }
